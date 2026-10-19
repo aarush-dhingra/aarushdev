@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects · Aarush Dhingra</title>
+  <meta name="description" content="Things Aarush Dhingra has built: NetShape, Prmpt, DevPulse, Jev vs Laya, VidNova and more." />
+  <meta name="theme-color" content="#f3efe7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b0b0a" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <script>
+    (function () { try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {} })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=Fragment+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="wide">
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas id="topo" aria-hidden="true"></canvas>
+
+  <header class="top">
+    <nav class="nav" aria-label="Main">
+      <a href="/">home <kbd>h</kbd></a>
+      <a href="/projects/" aria-current="page">projects <kbd>p</kbd></a>
+    </nav>
+    <div class="top-right">
+      <span class="mono muted" id="clock" aria-label="Local time in Bengaluru"></span>
+      <button class="theme" id="theme" type="button" aria-label="Toggle colour theme" title="Toggle theme (t)">
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="wide">
+    <section class="page-head">
+      <h1 class="bw">projects</h1>
+      <p class="bw">Things I've built, broken and rebuilt. Agents and LLM pipelines first, then the dev tools and full-stack work. The demos are live, so poke at them.</p>
+    </section>
+
+    <section class="bento" data-spot>
+      <!-- prmpt -->
+      <article class="card spot span2 beam rv" id="prmpt" data-demo="prmpt">
+        <span class="beam-ring" aria-hidden="true"></span>
+        <div class="card-head"><h3>Prmpt</h3><div class="pills"><span class="pill">llm pipeline · rag</span><a class="pill live" href="https://www.tryprmpt.com/" target="_blank" rel="noopener">live ↗</a></div></div>
+        <p class="tag">A better prompt, one hotkey away.</p>
+        <div class="demo demo-prmpt" aria-hidden="true">
+          <div class="pm-in"><span class="pm-caret" id="pm-in"></span></div>
+          <div class="pm-keys"><kbd>alt</kbd><kbd>space</kbd><span>optimise</span></div>
+          <div class="pm-out" id="pm-out"></div>
+        </div>
+        <p class="desc">A desktop overlay you summon from any app. A multi-stage pipeline (Claude and GPT-4o via LiteLLM/OpenRouter) classifies intent, asks what's missing and streams a structured prompt back over WebSocket. It keeps a local RAG index of your codebase too: pgvector, full-text and sparse embeddings.</p>
+        <div class="meta">
+          <span class="mono muted">electron · react · rust · python</span>
+          <span class="links"><a class="u" href="https://www.tryprmpt.com/" target="_blank" rel="noopener">tryprmpt.com <span class="arr">↗</span></a></span>
+        </div>
+      </article>
+      <!-- jev vs laya -->
+      <article class="card spot rv" id="jev" data-demo="chess">
+        <div class="card-head"><h3>Jev vs Laya</h3><div class="pills"><span class="pill">agents · llms</span></div></div>
+        <p class="tag">Two models, one chessboard.</p>
+        <div class="demo demo-chess" aria-hidden="true">
+          <div class="board" id="board"></div>
+          <div class="chess-side">
+            <span data-side="b">laya <i>local</i></span>
+            <span id="chess-move">—</span>
+            <span data-side="w">jev <i>api</i></span>
+          </div>
+        </div>
+        <p class="desc">A local arena where an API-hosted model and a locally-run one play chess, choosing from the same candidate moves. Live board, per-move reasoning, replays and PGN export. Stockfish reviews the finished games.</p>
+        <div class="meta">
+          <span class="mono muted">python · python-chess · stockfish</span>
+          <span class="links"><a class="u" href="https://github.com/aarush-dhingra/Jev-vs-Laya" target="_blank" rel="noopener">github <span class="arr">↗</span></a></span>
+        </div>
+      </article>
+      <!-- wh-bot -->
+      <article class="card spot rv" id="whbot" style="--d:80" data-demo="chat">
+        <div class="card-head"><h3>wh-bot</h3><div class="pills"><span class="pill">local llm · side quest</span></div></div>
+        <p class="tag">WhatsApp replies, written by a model on my laptop.</p>
+        <div class="demo demo-chat" id="chat" aria-hidden="true"></div>
+        <p class="desc">An Android notification listener hands incoming messages to a local Phi-3 (via Ollama) on the same Wi-Fi, then fires the reply back through WhatsApp. No cloud, no API bill.</p>
+        <div class="meta">
+          <span class="mono muted">python · ollama · android</span>
+          <span class="links"><a class="u" href="https://github.com/aarush-dhingra/wh-bot" target="_blank" rel="noopener">github <span class="arr">↗</span></a></span>
+        </div>
+      </article>
+      <!-- netshape -->
+      <article class="card spot span2 rv" id="netshape" data-demo="netshape">
+        <div class="card-head">
+          <h3>NetShape</h3>
+          <div class="pills"><span class="pill">dev tool · pypi</span><a class="pill live" href="https://netshape.vercel.app/" target="_blank" rel="noopener">live ↗</a></div>
+        </div>
+        <p class="tag">Simulate bad networks for any app, without touching its code.</p>
+        <div class="demo demo-net">
+          <div class="net-top">
+            <div class="net-profiles" role="radiogroup" aria-label="Network profile">
+              <button type="button" role="radio" aria-checked="true" data-p="fiber">fiber</button>
+              <button type="button" role="radio" aria-checked="false" data-p="4g">4g</button>
+              <button type="button" role="radio" aria-checked="false" data-p="3g">3g</button>
+              <button type="button" role="radio" aria-checked="false" data-p="2g">2g</button>
+            </div>
+            <span class="mono muted" id="net-read" aria-live="polite"></span>
+          </div>
+          <canvas id="net-canvas" aria-hidden="true"></canvas>
+        </div>
+        <p class="desc">Wraps any process in a local HTTP/HTTPS forward proxy that injects bandwidth caps, latency, packet loss and jitter. Token-bucket throttling on asyncio, 12 profiles from 2G to fiber, live adjustment without restarts, per-endpoint regex rules, and YAML scenarios like 4G → dead zone → 2G. It also ships a built-in dashboard streamed over SSE.</p>
+        <div class="meta">
+          <span class="cmd"><code>pip install netshape</code><button class="mini" type="button" data-copy="pip install netshape"><span>copy</span><span>copied</span></button></span>
+          <span class="links">
+            <a class="u" href="https://github.com/aarush-dhingra/netshape" target="_blank" rel="noopener">github <span class="arr">↗</span></a>
+            <a class="u" href="https://pypi.org/project/netshape/" target="_blank" rel="noopener">pypi <span class="arr">↗</span></a>
+            <a class="u" href="https://netshape.vercel.app/" target="_blank" rel="noopener">site <span class="arr">↗</span></a>
+          </span>
+        </div>
+      </article>
+      <!-- devpulse -->
+      <article class="card spot rv" id="devpulse" data-demo="pulse">
+        <div class="card-head"><h3>DevPulse</h3><div class="pills"><span class="pill">full-stack</span><a class="pill live" href="https://dev-pulse-engineering-dashboard.vercel.app/" target="_blank" rel="noopener">live ↗</a></div></div>
+        <p class="tag">Your whole dev life on one page.</p>
+        <div class="demo" aria-hidden="true">
+          <div class="pulse-grid" id="pulse-grid"></div>
+          <div class="pulse-legend mono muted"><span>github</span><span>leetcode</span><span>codeforces</span><span>wakatime</span></div>
+        </div>
+        <p class="desc">Pulls activity from GitHub, LeetCode, GeeksForGeeks, Codeforces, WakaTime and Dev.to into one shareable profile. GitHub OAuth, background sync workers on BullMQ, and Redis caching in front of Postgres.</p>
+        <div class="meta">
+          <span class="mono muted">react · express · postgres · redis</span>
+          <span class="links">
+            <a class="u" href="https://dev-pulse-engineering-dashboard.vercel.app/" target="_blank" rel="noopener">live <span class="arr">↗</span></a>
+            <a class="u" href="https://github.com/aarush-dhingra/devPulse" target="_blank" rel="noopener">github <span class="arr">↗</span></a>
+          </span>
+        </div>
+      </article>
+      <!-- vidnova -->
+      <article class="card spot rv" id="vidnova" data-demo="vid" style="--d:80">
+        <div class="card-head"><h3>VidNova</h3><div class="pills"><span class="pill">full-stack</span></div></div>
+        <p class="tag">A video platform, end to end.</p>
+        <div class="demo demo-vid">
+          <div class="vid-screen" id="vid-screen">
+            <div class="vid-title" aria-hidden="true"><span>indexes that saved my feed</span><span>vidnova</span></div>
+            <button class="vid-play" id="vid-play" type="button" aria-label="Play demo"></button>
+          </div>
+          <div class="vid-bar" id="vid-bar" aria-hidden="true">
+            <div class="vid-buf" id="vid-buf"></div>
+            <div class="vid-pos" id="vid-pos"></div>
+            <span class="vid-tip mono" id="vid-tip">0:00</span>
+          </div>
+          <div class="vid-meta mono muted"><span id="vid-time">0:00 / 3:24</span><span>1080p</span></div>
+        </div>
+        <p class="desc">Hosting, playback, channels, subscriptions, likes and comments. JWT-secured REST APIs, with MongoDB indexes and a schema shaped around the feed queries.</p>
+        <div class="meta">
+          <span class="mono muted">mongodb · express · react · node</span>
+          <span class="links"><a class="u" href="https://github.com/aarush-dhingra/VidNova" target="_blank" rel="noopener">github <span class="arr">↗</span></a></span>
+        </div>
+      </article>
+      <!-- more -->
+      <article class="card spot more span2 rv">
+        <div class="card-head"><h3>more on github</h3><div class="pills"><span class="pill" id="repo-count">20 repos</span></div></div>
+        <ul>
+          <li><a class="u" href="https://github.com/aarush-dhingra/QuickCourt" target="_blank" rel="noopener">QuickCourt</a><span>sports booking · ts</span></li>
+          <li><a class="u" href="https://github.com/aarush-dhingra/Student_Performace_Analyzer" target="_blank" rel="noopener">Student Performance Analyzer</a><span>js</span></li>
+          <li><a class="u" href="https://github.com/aarush-dhingra/banking_system" target="_blank" rel="noopener">Banking System</a><span>js</span></li>
+          <li><a class="u" href="https://github.com/aarush-dhingra/genai-python" target="_blank" rel="noopener">genai-python</a><span>python</span></li>
+        </ul>
+        <div class="langs" id="langs" hidden>
+          <div class="lang-bar"></div>
+          <div class="lang-key mono muted"></div>
+        </div>
+        <div class="meta"><a class="u" href="https://github.com/aarush-dhingra?tab=repositories" target="_blank" rel="noopener">see everything <span class="arr">↗</span></a></div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="sign rv">got a rabbit hole? <span>i'll bring the shovel.</span></p>
+    <div class="cta rv">
+      <button class="btn" type="button" data-copy="aarushdhingra27@gmail.com">
+        <span class="swap"><span>aarushdhingra27@gmail.com</span><span>copied to clipboard</span></span>
+      </button>
+      <a class="btn ghost" href="/assets/aarush-dhingra-resume.pdf" target="_blank" rel="noopener">resume <span class="arr">↗</span></a>
+      <div class="dock" aria-label="Elsewhere">
+        <a href="https://github.com/aarush-dhingra" target="_blank" rel="noopener" data-tip="github" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+        <a href="https://www.linkedin.com/in/aarush-dhingra-588719282/" target="_blank" rel="noopener" data-tip="linkedin" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.6 6H1.2v8h2.4V6zM2.4 4.8a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8zM14.8 9.6c0-2.2-1.2-3.8-3.3-3.8-1 0-1.8.5-2.2 1.2V6H7v8h2.4V9.9c0-1.1.5-1.9 1.5-1.9s1.4.8 1.4 1.9V14h2.5V9.6z"/></svg></a>
+        <a href="https://x.com/Aarush105" target="_blank" rel="noopener" data-tip="x / twitter" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="https://www.instagram.com/aarush.32" target="_blank" rel="noopener" data-tip="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+        <a href="https://leetcode.com/u/aarush_dhingra/" target="_blank" rel="noopener" data-tip="leetcode" aria-label="LeetCode"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg></a>
+      </div>
+    </div>
+    <canvas class="horizon" aria-hidden="true"></canvas>
+    <div class="foot-row">
+      <span class="mono muted" id="push">© 2026 aarush dhingra</span>
+      <span class="mono muted keys"><kbd>h</kbd> home <kbd>p</kbd> projects <kbd>t</kbd> theme</span>
+    </div>
+  </footer>
+
+  <script src="/js/core.js"></script>
+  <script src="/js/projects.js"></script>
+</body>
+</html>
