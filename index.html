@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aarush Dhingra</title>
+  <meta name="description" content="Aarush Dhingra, AI engineer in Bengaluru. Agents, LLM pipelines and developer tools that actually ship." />
+  <meta name="theme-color" content="#f3efe7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b0b0a" media="(prefers-color-scheme: dark)" />
+  <meta property="og:title" content="Aarush Dhingra" />
+  <meta property="og:description" content="AI engineer in Bengaluru. Drop me into a rabbit hole and I'll climb out with a product." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <script>
+    (function () {
+      var d = document.documentElement;
+      try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") d.dataset.theme = t; } catch (e) {}
+      // the sunset plays on a refresh or a fresh arrival, not when you click back here from another page
+      try {
+        var nav = performance.getEntriesByType("navigation")[0];
+        var type = nav ? nav.type : "navigate";
+        var fromHere = false;
+        try { fromHere = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+        var fresh = type === "reload" || (type === "navigate" && !fromHere);
+        if (fresh && !matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("intro-pending");
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=Fragment+Mono&family=Noto+Sans+JP:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas id="topo" aria-hidden="true"></canvas>
+
+  <header class="top">
+    <nav class="nav" aria-label="Main">
+      <a href="/" aria-current="page">home <kbd>h</kbd></a>
+      <a href="/projects/">projects <kbd>p</kbd></a>
+    </nav>
+    <div class="top-right">
+      <span class="mono muted" id="clock" aria-label="Local time in Bengaluru"></span>
+      <button class="theme" id="theme" type="button" aria-label="Toggle colour theme" title="Toggle theme (t)">
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- hero -->
+    <section class="hero">
+      <div class="hello">
+        <span class="avatar bw" title="hi, that's me">
+          <img src="/assets/me.jpg" alt="Aarush Dhingra" width="76" height="76" />
+          <i class="status" aria-hidden="true"></i>
+        </span>
+        <div>
+          <h1 class="bw">Aarush Dhingra</h1>
+          <p class="mono handle bw">ai engineer · agents, llm pipelines, dev tools</p>
+        </div>
+      </div>
+
+      <p class="lede bw">
+        i build <span class="flip" data-words="ai agents|llm pipelines|dev tools|products people use">ai agents</span>
+        that actually ship, and i'm happiest when something i don't understand yet is staring right back at me.
+      </p>
+
+      <ul class="lines">
+        <li class="bw">currently sde intern at <span class="chip">ThinkSeed</span>, building a test-automation tool that simulates a phone, so hardware tests stop needing the hardware.</li>
+        <li class="bw">launched <a class="chip" href="https://www.tryprmpt.com/" target="_blank" rel="noopener">Prmpt</a>, a multi-stage llm pipeline that fixes your prompt before you hit enter.</li>
+        <li class="bw">shipped <a class="chip" href="https://netshape.vercel.app/" target="_blank" rel="noopener">NetShape</a> to PyPI. it makes your app think it's on 2G.</li>
+        <li class="bw">cs &amp; data science at <span class="chip">CMRIT</span>, bengaluru, class of '27.</li>
+      </ul>
+
+      <p class="aka bw"><span class="mono muted">also known as</span> <span class="flip alt" data-words="mountain climber|sunset chaser|beach person|weekend trekker">mountain climber</span></p>
+
+      <blockquote class="hole bw">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-dasharray="3 3" style="transform-box:fill-box"/><circle cx="13" cy="12.5" r="6" stroke-dasharray="2 2.5" style="transform-box:fill-box"/><circle cx="13.5" cy="13" r="2.4" style="transform-box:fill-box"/></svg>
+        i may not know everything. but drop me into a rabbit hole and i'll climb out with a product you didn't know you needed.
+        <em>how most of my projects start</em>
+      </blockquote>
+
+      <p class="peaks bw">
+        off the clock it's <span class="nb sunword">beach sunsets</span> and <span class="nb sunword">mountain summits</span>.
+        the view from the top of a trek is the only thing that beats a green build.
+      </p>
+
+      <div class="cta bw">
+        <button class="btn" type="button" data-copy="aarushdhingra27@gmail.com">
+          <span class="swap"><span>copy my email</span><span>copied, talk soon</span></span>
+        </button>
+        <a class="btn ghost" href="/assets/aarush-dhingra-resume.pdf" target="_blank" rel="noopener">resume <span class="arr">↗</span></a>
+      </div>
+      <div class="dock bw" aria-label="Elsewhere">
+        <a href="https://github.com/aarush-dhingra" target="_blank" rel="noopener" data-tip="github" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+        <a href="https://www.linkedin.com/in/aarush-dhingra-588719282/" target="_blank" rel="noopener" data-tip="linkedin" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.6 6H1.2v8h2.4V6zM2.4 4.8a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8zM14.8 9.6c0-2.2-1.2-3.8-3.3-3.8-1 0-1.8.5-2.2 1.2V6H7v8h2.4V9.9c0-1.1.5-1.9 1.5-1.9s1.4.8 1.4 1.9V14h2.5V9.6z"/></svg></a>
+        <a href="https://x.com/Aarush105" target="_blank" rel="noopener" data-tip="x / twitter" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="https://www.instagram.com/aarush.32" target="_blank" rel="noopener" data-tip="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+        <a href="https://leetcode.com/u/aarush_dhingra/" target="_blank" rel="noopener" data-tip="leetcode" aria-label="LeetCode"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg></a>
+        <a href="mailto:aarushdhingra27@gmail.com" data-tip="email" aria-label="Email"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M2 4.5l6 4.5 6-4.5"/></svg></a>
+      </div>
+    </section>
+
+    <!-- right now -->
+    <section class="block" aria-labelledby="now-h">
+      <h2 class="label rv" id="now-h">right now</h2>
+      <div class="stealth spot rv" data-spot>
+        <div class="stealth-top">
+          <span class="pill live">building</span>
+          <span class="mono muted">voice agent · japanese · in progress</span>
+        </div>
+        <h3>a voice agent that teaches you japanese.</h3>
+        <div class="sensei" id="sensei" aria-hidden="true">
+          <div class="voice">
+            <span class="orb"></span>
+            <span class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="speaker mono" id="sensei-who">sensei</span>
+          </div>
+          <p class="jp" id="sensei-jp"></p>
+          <p class="romaji mono" id="sensei-ro"></p>
+          <p class="en" id="sensei-en"></p>
+        </div>
+        <p class="stealth-copy">No flashcards. You talk to it out loud, it talks back in Japanese and teaches you as you go. Want early access? Ask me.</p>
+        <div class="cta">
+          <a class="btn" href="mailto:aarushdhingra27@gmail.com?subject=early%20access%3A%20the%20japanese%20voice%20agent">get early access</a>
+          <a class="btn ghost" href="https://x.com/Aarush105" target="_blank" rel="noopener">dm me on x <span class="arr">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- work -->
+    <section class="block" aria-labelledby="work-h">
+      <h2 class="label rv" id="work-h">work</h2>
+      <ol class="jobs">
+        <li class="current rv">
+          <div class="row"><span class="who">ThinkSeed Systems <span>· sde intern</span></span><span class="mono muted">jul 2026 — now</span></div>
+          <p>Building a test-automation tool that simulates a phone, so hardware-dependent validation runs without the hardware. Manual testing down ~60%, run time down ~40%.</p>
+        </li>
+        <li class="rv">
+          <div class="row"><span class="who">SafeGuard Industries <span>· sde intern</span></span><span class="mono muted">jun — aug 2025</span></div>
+          <p>Employee and complaint management platforms for 200+ people, with REST APIs and role-based access across 5+ roles.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- skills -->
+    <section class="block" aria-labelledby="stack-h">
+      <h2 class="label rv" id="stack-h">what i work with</h2>
+      <dl class="skills">
+        <div class="rv"><dt class="mono">ai</dt><dd><span>LangGraph</span><span>LangChain</span><span>RAG</span><span>MCP</span><span>multi-agent systems</span><span>evals</span><span>pgvector</span></dd></div>
+        <div class="rv"><dt class="mono">backend</dt><dd><span>Python</span><span>FastAPI</span><span>Node.js</span><span>PostgreSQL</span><span>Redis</span><span>Docker</span></dd></div>
+        <div class="rv"><dt class="mono">frontend</dt><dd><span>TypeScript</span><span>React</span><span>Next.js</span><span>Tailwind</span></dd></div>
+      </dl>
+    </section>
+
+    <!-- the grind -->
+    <section class="block" aria-labelledby="grind-h">
+      <h2 class="label rv" id="grind-h">the grind <a href="https://github.com/aarush-dhingra" target="_blank" rel="noopener">@aarush-dhingra ↗</a></h2>
+      <div class="gh spot rv" id="gh" data-spot>
+        <div class="gh-head">
+          <span><b id="gh-total">684</b> contributions in the last year</span>
+          <span class="mono muted">each dot is a day</span>
+        </div>
+        <div class="gh-scroll"><div class="gh-grid"></div></div>
+        <div class="gh-months mono muted"></div>
+      </div>
+      <a class="lc spot rv" id="lc" href="https://leetcode.com/u/aarush_dhingra/" target="_blank" rel="noopener" data-spot>
+        <div class="lc-left">
+          <span class="mono muted">leetcode · part-time dsa grinder</span>
+          <span class="lc-num"><b id="lc-total">229</b> solved</span>
+          <span class="lc-sub">full-time humbled by dynamic programming</span>
+        </div>
+        <div class="lc-bars">
+          <div class="lc-bar" data-k="easy"><span class="mono">easy</span><i><b style="--p:0"></b></i><span class="mono n">119</span></div>
+          <div class="lc-bar" data-k="medium"><span class="mono">medium</span><i><b style="--p:0"></b></i><span class="mono n">98</span></div>
+          <div class="lc-bar" data-k="hard"><span class="mono">hard</span><i><b style="--p:0"></b></i><span class="mono n">12</span></div>
+        </div>
+      </a>
+    </section>
+
+    <!-- off the clock -->
+    <section class="block" aria-labelledby="life-h">
+      <h2 class="label rv" id="life-h">off the clock <span class="count" id="deck-count"></span></h2>
+      <p class="rv life-intro">Sunsets on beaches, summits in the snow, and a song for each one.</p>
+      <div class="album rv">
+        <div class="deck" id="deck" tabindex="0" role="region" aria-label="Photo deck. Drag the top photo away, or use the arrow keys."></div>
+        <div class="album-side">
+          <span class="mono muted album-kicker">this one's song</span>
+          <p class="album-song" id="album-song">&nbsp;</p>
+          <p class="album-artist mono" id="album-artist">&nbsp;</p>
+          <div class="deck-player">
+            <button class="sound" id="sound" type="button" aria-pressed="false" title="Sound (m)">
+              <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <span class="sound-label">sound off</span>
+            </button>
+          </div>
+          <div class="deck-ctrl">
+            <button class="ctl" id="deck-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3L5 8l5 5"/></svg></button>
+            <button class="ctl" id="deck-next" type="button" aria-label="Next photo"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3l5 5-5 5"/></svg></button>
+            <span class="mono muted deck-hint">or drag the photo away</span>
+          </div>
+          <div class="deck-progress" aria-hidden="true"><i id="deck-bar"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- got an idea -->
+    <section class="block" aria-labelledby="idea-h">
+      <h2 class="label rv" id="idea-h">got an idea?</h2>
+      <p class="sign rv">got an idea you can't stop thinking about? <span>let's build it together.</span></p>
+      <form class="pitch spot rv" id="pitch" data-spot>
+        <label for="pitch-in" class="mono muted">pitch it in one line, it opens in your mail app</label>
+        <div class="pitch-row">
+          <input id="pitch-in" name="idea" type="text" maxlength="240" autocomplete="off" placeholder="an agent that..." />
+          <button class="btn" type="submit">send it <span class="arr">→</span></button>
+        </div>
+        <div class="seeds">
+          <button type="button" class="mono">an agent that…</button>
+          <button type="button" class="mono">a dev tool for…</button>
+          <button type="button" class="mono">a hackathon team for…</button>
+          <button type="button" class="mono">something weird</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="sign rv">you made it to the summit. <span>thanks for the climb.</span></p>
+    <div class="cta rv">
+      <button class="btn" type="button" data-copy="aarushdhingra27@gmail.com">
+        <span class="swap"><span>aarushdhingra27@gmail.com</span><span>copied to clipboard</span></span>
+      </button>
+      <div class="dock" aria-label="Elsewhere">
+        <a href="https://github.com/aarush-dhingra" target="_blank" rel="noopener" data-tip="github" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+        <a href="https://www.linkedin.com/in/aarush-dhingra-588719282/" target="_blank" rel="noopener" data-tip="linkedin" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.6 6H1.2v8h2.4V6zM2.4 4.8a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8zM14.8 9.6c0-2.2-1.2-3.8-3.3-3.8-1 0-1.8.5-2.2 1.2V6H7v8h2.4V9.9c0-1.1.5-1.9 1.5-1.9s1.4.8 1.4 1.9V14h2.5V9.6z"/></svg></a>
+        <a href="https://x.com/Aarush105" target="_blank" rel="noopener" data-tip="x / twitter" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="https://www.instagram.com/aarush.32" target="_blank" rel="noopener" data-tip="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+        <a href="https://leetcode.com/u/aarush_dhingra/" target="_blank" rel="noopener" data-tip="leetcode" aria-label="LeetCode"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg></a>
+      </div>
+    </div>
+    <canvas class="horizon" aria-hidden="true"></canvas>
+    <div class="foot-row">
+      <span class="mono muted" id="push">© 2026 aarush dhingra</span>
+      <span class="mono muted keys"><kbd>h</kbd> home <kbd>p</kbd> projects <kbd>t</kbd> theme <kbd>m</kbd> sound</span>
+    </div>
+  </footer>
+
+  <script src="/photos.js"></script>
+  <script src="/js/core.js"></script>
+  <script src="/js/home.js"></script>
+</body>
+</html>
