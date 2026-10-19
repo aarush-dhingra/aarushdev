@@ -23,10 +23,12 @@
 
   /* ---------- colours ---------- */
   const C = {};
+  const colorHooks = [];
   function readColors() {
     const cs = getComputedStyle(root);
     for (const k of ["bg", "bg-2", "fg", "fg-2", "muted", "line", "sun", "dusk"]) C[k] = cs.getPropertyValue("--" + k).trim();
     C.dark = (root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+    colorHooks.forEach((f) => f());
   }
   readColors();
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
@@ -202,28 +204,34 @@
   /* ---------- dock: icons swell as the cursor gets close ---------- */
   if (finePointer && !reduced) $$(".dock").forEach((dock) => {
     const items = $$("a", dock);
-    dock.addEventListener("pointermove", (e) => {
-      items.forEach((a) => {
-        const r = a.getBoundingClientRect();
-        const d = Math.abs(e.clientX - (r.left + r.width / 2));
-        const s = 1 + 0.36 * Math.pow(clamp(1 - d / 90), 2);
-        a.style.transform = `scale(${s.toFixed(3)})`;
-        a.style.setProperty("--s", s.toFixed(3));
+    let x = 0, queued = false, centres = null;
+    const apply = () => {
+      queued = false;
+      if (!centres) centres = items.map((a) => { const r = a.getBoundingClientRect(); return r.left + r.width / 2; });
+      items.forEach((a, i) => {
+        const s = (1 + 0.36 * Math.pow(clamp(1 - Math.abs(x - centres[i]) / 90), 2)).toFixed(3);
+        a.style.transform = `scale(${s})`;
+        a.style.setProperty("--s", s);
       });
-    });
+    };
+    dock.addEventListener("pointerenter", () => (centres = null));
+    dock.addEventListener("pointermove", (e) => { x = e.clientX; if (!queued) { queued = true; requestAnimationFrame(apply); } });
     dock.addEventListener("pointerleave", () => items.forEach((a) => { a.style.transform = ""; a.style.setProperty("--s", 1); }));
   });
 
   /* ---------- spotlight borders: every card in the group catches the light ---------- */
   $$("[data-spot]").forEach((grp) => {
     const cards = $$(".spot", grp);
-    grp.addEventListener("pointermove", (e) => {
-      cards.forEach((c) => {
-        const r = c.getBoundingClientRect();
-        c.style.setProperty("--mx", e.clientX - r.left + "px");
-        c.style.setProperty("--my", e.clientY - r.top + "px");
+    let x = 0, y = 0, queued = false;
+    const apply = () => {
+      queued = false;
+      const rects = cards.map((c) => c.getBoundingClientRect());
+      cards.forEach((c, i) => {
+        c.style.setProperty("--mx", x - rects[i].left + "px");
+        c.style.setProperty("--my", y - rects[i].top + "px");
       });
-    });
+    };
+    grp.addEventListener("pointermove", (e) => { x = e.clientX; y = e.clientY; if (!queued) { queued = true; requestAnimationFrame(apply); } });
   });
 
   /* ---------- simplex noise (3d), for the topo map ---------- */
@@ -269,97 +277,153 @@
     };
   }
 
-  /* ---------- topo: a contour map that drifts, and rises where your cursor is ---------- */
-  (function topo() {
-    const c = $("#topo");
-    if (!c) return;
+  /* ---------- topo: a contour map that drifts, and rises softly where your cursor is ---------- */
+  // the engine runs in a worker on an OffscreenCanvas, so drawing never competes with scrolling.
+  // it's written to run anywhere: browsers without OffscreenCanvas get the same engine on the main thread.
+  function topoEngine(scope) {
     const noise = makeNoise3D(11);
-    const CELL = 20;
-    let ctx, w, h, cols, rows, vals;
-    let mx = -1e4, my = -1e4, tx = -1e4, ty = -1e4, amp = 0, tamp = 0;
-    function resize() {
-      ({ ctx, w, h } = sizeCanvas(c, innerWidth, innerHeight));
-      cols = Math.ceil(w / CELL) + 1;
-      rows = Math.ceil(h / CELL) + 1;
-      vals = new Float32Array(cols * rows);
-      draw(performance.now());
-    }
-    addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
-      tx = e.clientX; ty = e.clientY; tamp = 1;
-      if (mx < -1e3) { mx = tx; my = ty; }
-    }, { passive: true });
-    document.addEventListener("pointerleave", () => (tamp = 0));
+    const CELL = 24, SIG2 = 2 * 180 * 180, STEP = 0.11;
+    let ctx = null, w = 0, h = 0, cols = 0, rows = 0, vals = null;
+    let mx = -1e4, my = -1e4, tx = -1e4, ty = -1e4, amp = 0, tamp = 0, sy = 0, tsy = 0, gotScroll = false;
+    let fg = "#edebe6", lo = 0.05, hi = 0.09, running = true, still = false, timer = 0, vignette = null;
+    const t0 = Date.now();
 
+    function size(W, H) {
+      w = W; h = H;
+      ctx.canvas.width = W; ctx.canvas.height = H;
+      cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
+      vals = new Float32Array(cols * rows);
+      vignette = null;
+    }
     function field(t) {
-      const sy = scrollY * 0.22;
-      const S = 2 * 140 * 140;
+      const near = amp > 0.01;
       for (let j = 0; j < rows; j++) {
-        const y = j * CELL;
+        const y = j * CELL, ny = (y + sy) * 0.0016, ny2 = (y + sy) * 0.0042;
         for (let i = 0; i < cols; i++) {
           const x = i * CELL;
-          let n = noise(x * 0.0017, (y + sy) * 0.0017, t) * 0.72 + noise(x * 0.0046 + 31, (y + sy) * 0.0046, t * 1.7) * 0.28;
-          if (amp > 0.01) { const dx = x - mx, dy = y - my; n += amp * 0.85 * Math.exp(-(dx * dx + dy * dy) / S); }
+          let n = noise(x * 0.0016, ny, t) * 0.74 + noise(x * 0.0042 + 31, ny2, t * 1.5) * 0.26;
+          if (near) { const dx = x - mx, dy = y - my; n += amp * 0.6 * Math.exp(-(dx * dx + dy * dy) / SIG2); }
           vals[j * cols + i] = n;
         }
       }
     }
-
+    // marching squares, no allocations: interpolate straight into moveTo/lineTo
     function march(L) {
       for (let j = 0; j < rows - 1; j++) {
-        const y0 = j * CELL, y1 = y0 + CELL;
+        const y0 = j * CELL, y1 = y0 + CELL, r0 = j * cols, r1 = r0 + cols;
         for (let i = 0; i < cols - 1; i++) {
-          const a = vals[j * cols + i], b = vals[j * cols + i + 1];
-          const cc = vals[(j + 1) * cols + i + 1], d = vals[(j + 1) * cols + i];
-          const k = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (cc > L ? 2 : 0) | (d > L ? 1 : 0);
+          const a = vals[r0 + i], b = vals[r0 + i + 1], c = vals[r1 + i + 1], d = vals[r1 + i];
+          const k = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (d > L ? 1 : 0);
           if (k === 0 || k === 15) continue;
           const x0 = i * CELL, x1 = x0 + CELL;
-          const T = () => [x0 + (CELL * (L - a)) / (b - a), y0];
-          const R = () => [x1, y0 + (CELL * (L - b)) / (cc - b)];
-          const B = () => [x0 + (CELL * (L - d)) / (cc - d), y1];
-          const Lf = () => [x0, y0 + (CELL * (L - a)) / (d - a)];
-          const seg = (p, q) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); };
+          const tX = x0 + (CELL * (L - a)) / (b - a);
+          const rY = y0 + (CELL * (L - b)) / (c - b);
+          const bX = x0 + (CELL * (L - d)) / (c - d);
+          const lY = y0 + (CELL * (L - a)) / (d - a);
           switch (k) {
-            case 1: case 14: seg(Lf(), B()); break;
-            case 2: case 13: seg(B(), R()); break;
-            case 3: case 12: seg(Lf(), R()); break;
-            case 4: case 11: seg(T(), R()); break;
-            case 5: seg(T(), R()); seg(Lf(), B()); break;
-            case 6: case 9: seg(T(), B()); break;
-            case 7: case 8: seg(Lf(), T()); break;
-            case 10: seg(Lf(), T()); seg(B(), R()); break;
+            case 1: case 14: ctx.moveTo(x0, lY); ctx.lineTo(bX, y1); break;
+            case 2: case 13: ctx.moveTo(bX, y1); ctx.lineTo(x1, rY); break;
+            case 3: case 12: ctx.moveTo(x0, lY); ctx.lineTo(x1, rY); break;
+            case 4: case 11: ctx.moveTo(tX, y0); ctx.lineTo(x1, rY); break;
+            case 5: ctx.moveTo(tX, y0); ctx.lineTo(x1, rY); ctx.moveTo(x0, lY); ctx.lineTo(bX, y1); break;
+            case 6: case 9: ctx.moveTo(tX, y0); ctx.lineTo(bX, y1); break;
+            case 7: case 8: ctx.moveTo(x0, lY); ctx.lineTo(tX, y0); break;
+            case 10: ctx.moveTo(x0, lY); ctx.lineTo(tX, y0); ctx.moveTo(bX, y1); ctx.lineTo(x1, rY); break;
           }
         }
       }
     }
-
-    function draw(now) {
-      if (!ctx) return;
-      const t = now * 0.00003;
-      mx += (tx - mx) * 0.09; my += (ty - my) * 0.09; amp += (tamp - amp) * 0.04;
+    function draw() {
+      if (!ctx || !w) return;
+      const t = (Date.now() - t0) * 0.000016;
+      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
+      amp += (tamp - amp) * 0.03;
+      sy += (tsy - sy) * 0.1;
       field(t);
+      ctx.globalCompositeOperation = "source-over";
       ctx.clearRect(0, 0, w, h);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = C.fg;
-      const lo = C.dark ? 0.065 : 0.085, hi = C.dark ? 0.13 : 0.16;
-      let k = 0;
-      for (let L = -0.9; L <= 1.35; L += 0.09, k++) {
+      ctx.strokeStyle = fg;
+      let n = 0;
+      for (let L = -0.9; L <= 1.3; L += STEP, n++) {
         ctx.beginPath();
         march(L);
-        ctx.globalAlpha = k % 5 === 0 ? hi : lo;
+        ctx.globalAlpha = n % 5 === 0 ? hi : lo;
         ctx.stroke();
       }
+      // fade the middle so the text column stays clean (cheaper than a css mask on a live canvas)
       ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "destination-out";
+      if (!vignette) {
+        vignette = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+        vignette.addColorStop(0, "rgba(0,0,0,.82)");
+        vignette.addColorStop(1, "rgba(0,0,0,0)");
+      }
+      ctx.save();
+      ctx.translate(w / 2, h * 0.42);
+      ctx.scale(w * 0.38, h * 0.66);
+      ctx.fillStyle = vignette;
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.restore();
+      ctx.globalCompositeOperation = "source-over";
     }
+    function loop() {
+      timer = 0;
+      if (!running || still) return;
+      draw();
+      timer = setTimeout(loop, 33);
+    }
+    scope.onmessage = (e) => {
+      const m = e.data;
+      if (m.canvas) ctx = m.canvas.getContext("2d");
+      if (m.size) size(m.size[0], m.size[1]);
+      if (m.pointer) { tx = m.pointer[0]; ty = m.pointer[1]; tamp = 1; if (mx < -1e3) { mx = tx; my = ty; } }
+      if (m.leave) tamp = 0;
+      if (m.scroll != null) { tsy = m.scroll * 0.18; if (!gotScroll) { sy = tsy; gotScroll = true; } }
+      if (m.color) { fg = m.color; lo = m.dark ? 0.05 : 0.065; hi = m.dark ? 0.09 : 0.12; }
+      if (m.still != null) still = m.still;
+      if (m.run != null) running = m.run;
+      if (still) draw();
+      else if (running && !timer) loop();
+    };
+  }
 
-    resize();
-    addEventListener("resize", resize);
-    if (reduced) return;
-    let last = 0;
-    (function loop(now) {
-      if (!document.hidden && now - last > 42) { last = now; draw(now); }
-      requestAnimationFrame(loop);
-    })(0);
+  (function topo() {
+    const c = $("#topo");
+    if (!c) return;
+    let post = null;
+    if (c.transferControlToOffscreen && window.Worker && window.Blob) {
+      try {
+        const src = `${makeNoise3D.toString()}\n${topoEngine.toString()}\ntopoEngine(self);`;
+        const url = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+        const worker = new Worker(url);
+        const off = c.transferControlToOffscreen();
+        worker.postMessage({ canvas: off }, [off]);
+        post = (m) => worker.postMessage(m);
+      } catch (e) { post = null; }
+    }
+    if (!post) {
+      const scope = {};
+      topoEngine(scope);
+      scope.onmessage({ data: { canvas: c } });
+      post = (m) => scope.onmessage({ data: m });
+    }
+    post({ size: [innerWidth, innerHeight], scroll: scrollY, color: C.fg, dark: C.dark, still: reduced });
+    colorHooks.push(() => post({ color: C.fg, dark: C.dark }));
+
+    // pointer and scroll go over at most once per frame
+    let px = 0, py = 0, moved = false, scrolled = false, queued = false;
+    const flush = () => {
+      queued = false;
+      if (moved) { moved = false; post({ pointer: [px, py] }); }
+      if (scrolled) { scrolled = false; post({ scroll: scrollY }); }
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(flush); } };
+    addEventListener("pointermove", (e) => { if (e.pointerType !== "mouse") return; px = e.clientX; py = e.clientY; moved = true; queue(); }, { passive: true });
+    addEventListener("scroll", () => { scrolled = true; queue(); }, { passive: true });
+    document.addEventListener("pointerleave", () => post({ leave: true }));
+    addEventListener("resize", () => post({ size: [innerWidth, innerHeight] }));
+    document.addEventListener("visibilitychange", () => post({ run: !document.hidden }));
   })();
 
   /* ---------- the scene: a dot-matrix sunset over mountains, sea and a strip of beach ---------- */
@@ -446,9 +510,8 @@
     const LAYERS = [["star", 0.6, 0], ["back", 0.5, 0.5], ["bsnow", 0.8, 0.5], ["front", 0.88, 1], ["snow", 1, 1], ["sand", 0.5, 0], ["foam", 0.85, 0]];
 
     function draw(ctx, st, o) {
-      const { w, h, g, ox, oy, sh, top } = st;
+      const { w, h, g } = st;
       const s = g * 0.56, hs = s / 2;
-      const A = w / sh;
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = o.fg;
       for (const [k, alpha, par] of LAYERS) {
@@ -473,7 +536,15 @@
         }
       }
 
-      // sky: sun disc with its stripes, plus a dithered glow
+      sky(ctx, st, o);
+      sea(ctx, st, o);
+      ctx.globalAlpha = 1;
+    }
+
+    // sky: sun disc with its stripes, plus a dithered glow
+    function sky(ctx, st, o) {
+      const { w, g, ox, oy, sh, top } = st;
+      const s = g * 0.56, hs = s / 2, A = w / sh;
       const R = SR * sh, R2 = R * R, sunX = SU * w, sunY = top + o.sunV * sh;
       const sunB = [[], [], [], [], [], []], glow = [];
       if (o.sunA > 0) {
@@ -505,8 +576,13 @@
         const b = sunB[q];
         for (let i = 0; i < b.length; i += 2) ctx.fillRect(b[i] - hs, b[i + 1] - hs, s, s);
       }
+      ctx.globalAlpha = 1;
+    }
 
-      // sea: a slow shimmer and the sun's reflection breaking up on the water
+    // sea: a slow shimmer and the sun's reflection breaking up on the water
+    function sea(ctx, st, o) {
+      const { w, g, ox, oy, sh, top } = st;
+      const s = g * 0.56, hs = s / 2, A = w / sh;
       if (o.seaA > 0) {
         const se = st.sea, refl = [], base = [];
         for (let n = 0; n < se.length; n += 2) {
@@ -530,7 +606,54 @@
       ctx.globalAlpha = 1;
     }
 
-    return { build, particles, draw, SV };
+    // everything that never moves gets painted once into its own canvas
+    function bake(st, fg, dpr) {
+      const s = st.g * 0.56, hs = s / 2;
+      const layer = (paint) => {
+        const cv = document.createElement("canvas");
+        cv.width = Math.round(st.w * dpr); cv.height = Math.round(st.h * dpr);
+        const x = cv.getContext("2d");
+        x.setTransform(dpr, 0, 0, dpr, 0, 0);
+        paint(x);
+        return cv;
+      };
+      const dots = (x, names) => {
+        x.fillStyle = fg;
+        for (const [k, alpha] of names) {
+          const a = st.L[k];
+          x.globalAlpha = alpha;
+          for (let i = 0; i < a.length; i += 2) x.fillRect(a[i] - hs, a[i + 1] - hs, s, s);
+        }
+        x.globalAlpha = 1;
+      };
+      return {
+        fg,
+        sky: layer((x) => sky(x, st, { sunV: SV, sunA: 1, glowA: 1 })),
+        back: layer((x) => dots(x, [["back", 0.5], ["bsnow", 0.8]])),
+        front: layer((x) => dots(x, [["front", 0.88], ["snow", 1]])),
+        ground: layer((x) => dots(x, [["sand", 0.5], ["foam", 0.85]])),
+      };
+    }
+    // per frame: just the twinkling stars and the sea, plus four image draws
+    function drawBaked(ctx, st, baked, o) {
+      const { w, h, g } = st;
+      const s = g * 0.56, hs = s / 2, par = o.par || 0;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = o.fg;
+      const stars = st.L.star;
+      for (let i = 0; i < stars.length; i += 2) {
+        ctx.globalAlpha = 0.25 + 0.45 * (0.5 + 0.5 * Math.sin(o.t * 1.7 + i * 1.37));
+        ctx.fillRect(stars[i] - hs, stars[i + 1] - hs, s, s);
+      }
+      ctx.globalAlpha = 1;
+      ctx.drawImage(baked.sky, 0, 0, w, h);
+      ctx.drawImage(baked.back, par * 0.5 * g * 1.4, 0, w, h);
+      ctx.drawImage(baked.front, par * g * 1.4, 0, w, h);
+      ctx.drawImage(baked.ground, 0, 0, w, h);
+      sea(ctx, st, { fg: o.fg, t: o.t, sunA: 1, seaA: 1 });
+    }
+
+    return { build, particles, draw, bake, drawBaked, SV };
   })();
 
   const gridFor = (vw) => clamp(vw / 205, 4.5, 8);
@@ -539,20 +662,27 @@
   (function horizon() {
     const c = $(".horizon");
     if (!c) return;
-    let ctx, st, vis = false, par = 0, tpar = 0;
+    let ctx, st, baked = null, vis = false, par = 0, tpar = 0;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
     function resize() {
       const W = c.clientWidth, H = c.clientHeight;
       if (!W) return;
       ({ ctx } = sizeCanvas(c, W, H));
       st = Scene.build(W, H, W < 600 ? 3.4 : 4);
+      baked = null;
       draw(performance.now());
     }
-    const draw = (now) => st && Scene.draw(ctx, st, { fg: C.fg, t: now / 1000, sunV: Scene.SV, sunA: 1, glowA: 1, seaA: 1, par: reduced ? 0 : par });
+    const draw = (now) => {
+      if (!st) return;
+      if (!baked || baked.fg !== C.fg) baked = Scene.bake(st, C.fg, dpr);
+      Scene.drawBaked(ctx, st, baked, { fg: C.fg, t: now / 1000, par: reduced ? 0 : par });
+    };
+    colorHooks.push(() => draw(performance.now()));
     addEventListener("pointermove", (e) => { tpar = (e.clientX / innerWidth - 0.5) * 2; }, { passive: true });
     new IntersectionObserver(([e]) => (vis = e.isIntersecting)).observe(c);
     let last = 0;
     (function loop(now) {
-      if (vis && !reduced && !document.hidden && now - last > 60) { last = now; par += (tpar - par) * 0.15; draw(now); }
+      if (vis && !reduced && !document.hidden && now - last > 45) { last = now; par += (tpar - par) * 0.12; draw(now); }
       requestAnimationFrame(loop);
     })(0);
     addEventListener("resize", resize);
