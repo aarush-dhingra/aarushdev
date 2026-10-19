@@ -260,12 +260,6 @@ a.chip:hover { border-color: var(--muted); transform: translateY(-1px); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hole em { font-style: normal; color: var(--muted); display: block; margin-top: 4px; font: 11.5px var(--mono); }
 
-.peaks { margin-top: 14px; }
-.peaks .sunword {
-  background: linear-gradient(90deg, var(--sun), var(--dusk));
-  -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 500;
-}
-
 .cta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
 .btn {
   position: relative; display: inline-flex; align-items: center; gap: 8px;
