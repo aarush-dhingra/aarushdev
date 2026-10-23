@@ -753,36 +753,5 @@
     Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), sleep(300)]).then(ready, ready);
   }
 
-  /* ---------- last push, straight from github ---------- */
-  (async function lastPush() {
-    const el = $("#push");
-    if (!el) return;
-    const ago = (d) => {
-      const s = (Date.now() - new Date(d)) / 1000;
-      if (s < 3600) return `${Math.max(1, Math.round(s / 60))}m ago`;
-      if (s < 86400) return `${Math.round(s / 3600)}h ago`;
-      if (s < 86400 * 45) return `${Math.round(s / 86400)}d ago`;
-      return `${Math.round(s / (86400 * 30))}mo ago`;
-    };
-    let data = null;
-    try { data = JSON.parse(store.get("lastpush", sessionStorage) || "null"); } catch (e) {}
-    if (!data || Date.now() - data.at > 10 * 60 * 1000) {
-      try {
-        const r = await fetch("https://api.github.com/users/aarush-dhingra/events/public?per_page=30");
-        if (!r.ok) throw 0;
-        const ev = (await r.json()).find((x) => x.type === "PushEvent" || x.type === "CreateEvent");
-        if (!ev) throw 0;
-        data = { repo: ev.repo.name.split("/")[1], when: ev.created_at, at: Date.now() };
-        store.set("lastpush", JSON.stringify(data), sessionStorage);
-      } catch (e) { return; }
-    }
-    const a = document.createElement("a");
-    a.href = `https://github.com/aarush-dhingra/${data.repo}`;
-    a.target = "_blank"; a.rel = "noopener";
-    a.textContent = data.repo;
-    el.textContent = "";
-    el.append("last push → ", a, ` · ${ago(data.when)}`);
-  })();
-
   window.AD = { $, $$, C, clamp, lerp, sleep, sizeCanvas, reduced, finePointer, store, onReady: (f) => (isReady ? f() : document.addEventListener("ad:ready", f, { once: true })) };
 })();
